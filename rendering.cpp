@@ -5,6 +5,7 @@ using namespace std;
 
 // 랜더링 클래스
 
+// 생성자, 소멸자
 rendering::rendering(int sizex, int sizey, char* winName) {
     // 콘솔창 설정
     backScreen = curx = cury = 0;
@@ -19,6 +20,7 @@ rendering::~rendering() {
     CloseHandle(screen[1]);
 }
 
+// 버퍼 생성
 void rendering::screenInit() {
     // 버퍼 생성
     screen[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -31,32 +33,9 @@ void rendering::screenInit() {
     SetConsoleCursorInfo(screen[1], &CURSOR);
 }
 
-// 버퍼 그리기 - 텍스트, 좌표지정
-void rendering::screenRender(int x, int y, char* text) {
-    DWORD err;
-    COORD backBufferCursor = { (SHORT)x,(SHORT)y };
-    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
-    WriteFile(screen[backScreen], (char*)text, strlen(text), &err, NULL);
-}
 
-// 버퍼 그리기 - 문자, 좌표지정
-void rendering::screenRender(int x, int y, char ch) {
-    DWORD err;
-    COORD backBufferCursor = { (SHORT)x,(SHORT)y };
-    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
-    WriteFile(screen[backScreen], (char*)ch, 1, &err, NULL);
-}
-
-// 버퍼 그리기 - 텍스트
-void rendering::screenRender(char* text) {
-    DWORD err;
-    COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
-    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
-    WriteFile(screen[backScreen], (char*)text, strlen(text), &err, NULL);
-    curx = curx + (int)strlen(text);
-}
-
-void rendering::screenRender(char ch) {
+// 버퍼 그리기 - 일반 문자
+void rendering::screenRender(const char ch) {
     DWORD err;
     COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
     SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
@@ -64,8 +43,31 @@ void rendering::screenRender(char ch) {
     curx++;
 }
 
-// 유니코드용 - char인지 wchar_t인지 구분이 안 되는지 확인을 못 해서 뒤에 인자를 하나 더 넣은 거 같은데 참고
-void rendering::screenRender(wchar_t ch, char unicode) {
+void rendering::screenRender(const char* text) {
+    DWORD err;
+    COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
+    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
+    WriteFile(screen[backScreen], (char*)text, strlen(text), &err, NULL);
+    curx = curx + (int)strlen(text);
+}
+
+void rendering::screenRender(int x, int y, const char ch) {
+    DWORD err;
+    COORD backBufferCursor = { (SHORT)x,(SHORT)y };
+    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
+    WriteFile(screen[backScreen], (char*)ch, 1, &err, NULL);
+}
+
+void rendering::screenRender(int x, int y, const char* text) {
+    DWORD err;
+    COORD backBufferCursor = { (SHORT)x,(SHORT)y };
+    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
+    WriteFile(screen[backScreen], (char*)text, strlen(text), &err, NULL);
+}
+
+
+// 버퍼 그리기 - 유니코드 문자
+void rendering::screenRender(const wchar_t ch, char unicode) {
     DWORD err;
     COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
     SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
@@ -73,12 +75,28 @@ void rendering::screenRender(wchar_t ch, char unicode) {
     curx = curx + 2; // 유니코드라서
 }
 
-void rendering::screenRender(int x, int y, wchar_t ch, char unicode) {
+void rendering::screenRender(const wchar_t* text, char unicode) {
+    DWORD err;
+    COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
+    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
+    WriteFile(screen[backScreen], text, wcslen(text), &err, NULL);
+    curx = curx + (int)wcslen(text);
+}
+
+void rendering::screenRender(int x, int y, const wchar_t ch, char unicode) {
     DWORD err;
     COORD backBufferCursor = { (SHORT)x,(SHORT)y };
     SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
     WriteConsoleW(screen[backScreen], &ch, 1, &err, NULL);
 }
+
+void rendering::screenRender(int x, int y, const wchar_t* text) {
+    DWORD err;
+    COORD backBufferCursor = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
+    WriteConsoleW(screen[backScreen], text, wcslen(text), &err, NULL);
+}
+
 
 // 버퍼를 프론트에 올림
 void rendering::screenswitch() {

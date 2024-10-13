@@ -12,7 +12,7 @@ public:
 	int curx, cury;
 	int sizex, sizey;
 
-	// 생성자
+	// 생성자, 소멸자
 	rendering(int, int, char*);
 	~rendering();
 
@@ -20,18 +20,22 @@ public:
 	void screenInit();
 
 	// 버퍼 그리기 - 일반문자
-	void screenRender(char);
+	void screenRender(const char);
 	// 버퍼 그리기 - 일반텍스트
-	void screenRender(char*);
+	void screenRender(const char*);
 	// 버퍼 그리기 - x좌표, y좌표, 일반문자
-	void screenRender(int, int, char);
+	void screenRender(int, int, const char);
 	// 버퍼 그리기 - x좌표, y좌표,일반텍스트
-	void screenRender(int, int, char*);
+	void screenRender(int, int, const char*);
 
 	// 버퍼 그리기 - 유니코드
-	void screenRender(wchar_t, char);
+	void screenRender(const wchar_t, char);
+	// 버퍼 그리기 - 유니코드텍스트
+	void screenRender(const wchar_t*, char);
 	// 버퍼 그리기 - x좌표, y좌표, 유니코드
-	void screenRender(int, int, wchar_t, char);
+	void screenRender(int, int, const wchar_t, char);
+	// 버퍼 그리기 - x좌표, y좌표, 유니코드텍스트
+	void screenRender(int, int, const wchar_t*);
 
 	// 버퍼와 프론트를 교체
 	void screenswitch();

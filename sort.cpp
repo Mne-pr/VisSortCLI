@@ -174,8 +174,7 @@ private:
 
 public:
 
-    controller(char* whatsort, allSort* solution, vector<int>& data) : sol(solution) {
-        ticktime = 50;
+    controller(char* whatsort, allSort* solution, vector<int>& data, int tickt) : sol(solution), ticktime(tickt) {
         pt = new printer(sol->getDatalen(), whatsort, ticktime);
         pt->insertData(data);
         sol->insertData(&data);
@@ -216,7 +215,7 @@ int main() {
 
     // 정렬 방식은 bubbleSort로 설정
     bubbleSort method;
-    controller con((char*)"title Bubble", &method, data);
+    controller con((char*)"title Bubble", &method, data, 150);
 
     // 정렬 시작
     con.start();
