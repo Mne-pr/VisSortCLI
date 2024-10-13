@@ -8,8 +8,8 @@ class rendering {
 public:
 	HANDLE screen[2];
 	CONSOLE_CURSOR_INFO CURSOR;
-	int backScreen;
-	int curx, cury;
+	int backScreen = 0;
+	int curx = 0, cury = 0;
 	int sizex, sizey;
 
 	// 생성자, 소멸자
@@ -40,14 +40,13 @@ public:
 	// 버퍼와 프론트를 교체
 	void screenswitch();
 
-	// 엔터 - 좌표없이 srcrreRender()하는 경우 사용
+	// 엔터 - 좌표없이 계속 작성할 때 사용
 	void screenEndl();
 
 	// 버퍼 클리어 - 시작좌표, 끝좌표
-	void screenClear(int, int, int, int);
-	void screenClear(int, int, int, int, int);
-	void screenClear();
+	void screenClear(int, int, int, int, bool);
+	void screenClear(bool);
 
 	// 유니코드용 버퍼의 문자 교체
-	void charSwitch(int, int, int, int);
+	void charSwitch(int, int, int, int, bool);
 };

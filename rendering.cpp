@@ -6,9 +6,8 @@ using namespace std;
 // 랜더링 클래스
 
 // 생성자, 소멸자
-rendering::rendering(int sizex, int sizey, char* winName) {
+rendering::rendering(int sizex, int sizey, char* winName) : sizex(sizex), sizey(sizey) {
     // 콘솔창 설정
-    backScreen = curx = cury = 0;
     oss << "mode con: cols=" << sizex << " lines=" << sizey << endl;
     system(oss.str().c_str());
     system(winName);
@@ -19,6 +18,7 @@ rendering::~rendering() {
     CloseHandle(screen[0]);
     CloseHandle(screen[1]);
 }
+
 
 // 버퍼 생성
 void rendering::screenInit() {
@@ -98,57 +98,67 @@ void rendering::screenRender(int x, int y, const wchar_t* text) {
 }
 
 
-// 버퍼를 프론트에 올림
+// 버퍼를 프론트로 교체
 void rendering::screenswitch() {
     SetConsoleActiveScreenBuffer(screen[backScreen]);
     backScreen = !backScreen;
 }
 
+
+// 다음 줄 이동
 void rendering::screenEndl() { cury++; curx = 0; }
 
+
 // 버퍼 클리어 - 시작좌표, 끝좌표
-void rendering::screenClear(int x, int y, int x2, int y2) {
-    for (int i = y; i <= y2 - y; i++) {
-        COORD Coor = { (SHORT)x,(SHORT)i };
-        DWORD dw;
-        FillConsoleOutputCharacter(screen[backScreen], ' ', x2 - x, Coor, &dw);
-    }
-    curx = cury = 0;
-}
-
-void rendering::screenClear(int x, int y, int x2, int y2, int unicode) {
-    for (int i = y; i <= y2 - y; i++) {
-        COORD Coor = { (SHORT)x,(SHORT)i };
-        DWORD dw;
-        FillConsoleOutputCharacter(screen[backScreen], L' ', x2 - x, Coor, &dw);
-    }
-    curx = cury = 0;
-}
-
-void rendering::screenClear() {
-    COORD Coor = { 0 ,0 };
+void rendering::screenClear(int x, int y, int x2, int y2, bool isUnicode) {
     DWORD dw;
-    // 스크린 크기만큼 지워야할텐데
-    // FillConsoleOutputCharacter(screen[backScreen],'',크기,Coor, &dw);
+
+    for (int i = y; i <= y2; i++) {
+        COORD Coor = { (SHORT)x,(SHORT)i };
+        if (isUnicode) 
+            FillConsoleOutputCharacterW(screen[backScreen], (const wchar_t)L' ', x2 - x + 1, Coor, &dw);
+        else
+            FillConsoleOutputCharacterA(screen[backScreen], (const char)' ', x2 - x + 1, Coor, &dw);
+    }
+    curx = cury = 0;
 }
 
-void rendering::charSwitch(int x1, int y1, int x2, int y2) {
+void rendering::screenClear(bool isUnicode) {
+    DWORD dw;
 
-    COORD pos1 = { (SHORT)x1, (SHORT)y1 }; // 첫 번째 문자 위치
-    COORD pos2 = { (SHORT)x2, (SHORT)y2 }; // 두 번째 문자 위치
+    for (int i = 0; i <= sizey; i++) {
+        COORD Coor = { (SHORT)0, (SHORT)i };
+        if (isUnicode)
+            FillConsoleOutputCharacterW(screen[backScreen], (const wchar_t)L' ', sizex, Coor, &dw);
+        else
+            FillConsoleOutputCharacterA(screen[backScreen], (const char)' ', sizex, Coor, &dw);
+    }
+}
 
-    wchar_t char1[2], char2[2];
-    DWORD charsRead;
 
-    // 첫 번째 위치에서 문자 읽기
-    ReadConsoleOutputCharacterW(screen[backScreen], char1, 1, pos1, &charsRead);
-    // 두 번째 위치에서 문자 읽기
-    ReadConsoleOutputCharacterW(screen[backScreen], char2, 1, pos2, &charsRead);
+// 글자 스위치 - 서로의 좌표
+void rendering::charSwitch(int x1, int y1, int x2, int y2, bool isUnicode) {
 
-    // 첫 번째 위치에 두 번째 문자를 씀
-    WriteConsoleOutputCharacterW(screen[backScreen], char2, 1, pos1, &charsRead);
-    // 두 번째 위치에 첫 번째 문자를 씀
-    WriteConsoleOutputCharacterW(screen[backScreen], char1, 1, pos2, &charsRead);
+    COORD pos1 = { (SHORT)x1, (SHORT)y1 };
+    COORD pos2 = { (SHORT)x2, (SHORT)y2 };
+    DWORD dw;
+
+    if (isUnicode) {
+        wchar_t char1[2], char2[2];
+        // 각 위치의 문자 읽기
+        ReadConsoleOutputCharacterW(screen[backScreen], char1, 1, pos1, &dw);
+        ReadConsoleOutputCharacterW(screen[backScreen], char2, 1, pos2, &dw);
+
+        // 서로 위치의 자신의 문자 입력
+        WriteConsoleOutputCharacterW(screen[backScreen], char2, 1, pos1, &dw);
+        WriteConsoleOutputCharacterW(screen[backScreen], char1, 1, pos2, &dw);
+    } else {
+        char char1[2], char2[2];
+        ReadConsoleOutputCharacterA(screen[backScreen], char1, 1, pos1, &dw);
+        ReadConsoleOutputCharacterA(screen[backScreen], char2, 1, pos2, &dw);
+        WriteConsoleOutputCharacterA(screen[backScreen], char2, 1, pos1, &dw);
+        WriteConsoleOutputCharacterA(screen[backScreen], char1, 1, pos2, &dw);
+    }
 
     return;
 }
