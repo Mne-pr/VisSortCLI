@@ -33,7 +33,7 @@ public:
             for_each(data.begin(), data.end(), [&](int value) {
                 // 문자 세로배치 
                 for (int i = 0; i < value; i++) {
-                    panel->screenRender(4 + idx, 2 + m_value - i, L'□', 0);
+                    panel->screenRender(4 + idx, 2 + m_value - i, L'□');
                 }
                 idx += 2; // unicode 라서
             });
@@ -52,18 +52,18 @@ public:
         //cout << res[2] << "(" << res[1] << ") <-> " << res[4] << "(" << res[3] << ")" << endl;
         
         // up
-        panel->screenRender(0, 0, L'U', 0);
+        panel->screenRender(0, 0, L'U');
         for (int i = 0; i < 2; i++) {
-            panel->screenRender(6 + res[1] * 2, 2 + m_value - res[2], L'□', 0);
-            panel->screenRender(6 + res[3] * 2, 2 + m_value - res[4], L'□', 0);
-            panel->screenRender(6 + res[1] * 2, 2 + m_value, L' ', 0);
-            panel->screenRender(6 + res[3] * 2, 2 + m_value, L' ', 0);
+            panel->screenRender(6 + res[1] * 2, 2 + m_value - res[2], L'□');
+            panel->screenRender(6 + res[3] * 2, 2 + m_value - res[4], L'□');
+            panel->screenRender(6 + res[1] * 2, 2 + m_value, L' ');
+            panel->screenRender(6 + res[3] * 2, 2 + m_value, L' ');
             if (i == 0) { panel->screenswitch(); }
         }
         Sleep(ticktime);
 
         // change
-        panel->screenRender(0, 0, L'C', 0);
+        panel->screenRender(0, 0, L'C');
         int chlen = (res[2] > res[4]) ? res[2] : res[4];
         
         for (int i = 0; i < 2; i++) {
@@ -75,29 +75,29 @@ public:
         Sleep(ticktime);
 
         // down
-        panel->screenRender(0, 0, L'D', 0);
+        panel->screenRender(0, 0, L'D');
         for (int i = 0; i < 2; i++) {
-            panel->screenRender(6 + res[1] * 2, 2 + m_value - res[4], L' ', 0);
-            panel->screenRender(6 + res[3] * 2, 2 + m_value - res[2], L' ', 0);
-            panel->screenRender(6 + res[1] * 2, 2 + m_value, L'□', 0);
-            panel->screenRender(6 + res[3] * 2, 2 + m_value, L'□', 0);
+            panel->screenRender(6 + res[1] * 2, 2 + m_value - res[4], L' ');
+            panel->screenRender(6 + res[3] * 2, 2 + m_value - res[2], L' ');
+            panel->screenRender(6 + res[1] * 2, 2 + m_value, L'□');
+            panel->screenRender(6 + res[3] * 2, 2 + m_value, L'□');
             if (i == 0) { panel->screenswitch(); }
         }
         Sleep(ticktime);
 
-        panel->screenRender(0, 0, L' ', 0);
+        panel->screenRender(0, 0, L' ');
         panel->screenswitch();
-        panel->screenRender(0, 0, L' ', 0);
+        panel->screenRender(0, 0, L' ');
     }
 
     void printCursor(int idx1, int idx2) {
 
         for (int i = 0; i < 2; i++) {
-            panel->screenRender(0, 0, L'M', 0);
-            panel->screenRender(6 + cur1 * 2, 1, L' ', 0);
-            panel->screenRender(6 + cur2 * 2, 1, L' ', 0);
-            panel->screenRender(6 + idx1 * 2, 1, L'ˇ', 0);
-            panel->screenRender(6 + idx2 * 2, 1, L'ˇ', 0); //U+02C7, Caron
+            panel->screenRender(0, 0, L'M');
+            panel->screenRender(6 + cur1 * 2, 1, L' ');
+            panel->screenRender(6 + cur2 * 2, 1, L' ');
+            panel->screenRender(6 + idx1 * 2, 1, L'ˇ');
+            panel->screenRender(6 + idx2 * 2, 1, L'ˇ'); //U+02C7, Caron
             if (i == 0) { panel->screenswitch();}
         }
 

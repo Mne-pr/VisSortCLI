@@ -67,7 +67,7 @@ void rendering::screenRender(int x, int y, const char* text) {
 
 
 // 버퍼 그리기 - 유니코드 문자
-void rendering::screenRender(const wchar_t ch, char unicode) {
+void rendering::screenRender(const wchar_t ch) {
     DWORD err;
     COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
     SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
@@ -75,7 +75,7 @@ void rendering::screenRender(const wchar_t ch, char unicode) {
     curx = curx + 2; // 유니코드라서
 }
 
-void rendering::screenRender(const wchar_t* text, char unicode) {
+void rendering::screenRender(const wchar_t* text) {
     DWORD err;
     COORD backBufferCursor = { (SHORT)curx,(SHORT)cury };
     SetConsoleCursorPosition(screen[backScreen], backBufferCursor);
@@ -83,7 +83,7 @@ void rendering::screenRender(const wchar_t* text, char unicode) {
     curx = curx + (int)wcslen(text);
 }
 
-void rendering::screenRender(int x, int y, const wchar_t ch, char unicode) {
+void rendering::screenRender(int x, int y, const wchar_t ch) {
     DWORD err;
     COORD backBufferCursor = { (SHORT)x,(SHORT)y };
     SetConsoleCursorPosition(screen[backScreen], backBufferCursor);

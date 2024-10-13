@@ -29,11 +29,11 @@ public:
 	void screenRender(int, int, const char*);
 
 	// 버퍼 그리기 - 유니코드
-	void screenRender(const wchar_t, char);
+	void screenRender(const wchar_t);
 	// 버퍼 그리기 - 유니코드텍스트
-	void screenRender(const wchar_t*, char);
+	void screenRender(const wchar_t*);
 	// 버퍼 그리기 - x좌표, y좌표, 유니코드
-	void screenRender(int, int, const wchar_t, char);
+	void screenRender(int, int, const wchar_t);
 	// 버퍼 그리기 - x좌표, y좌표, 유니코드텍스트
 	void screenRender(int, int, const wchar_t*);
 
