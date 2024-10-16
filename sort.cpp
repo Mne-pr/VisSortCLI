@@ -144,7 +144,8 @@ public:
     }
 };
 
-// 정렬 계산
+
+// 정렬 계산 부모클래스
 class allSort {
 protected:
     vector<int>* data = nullptr;
@@ -182,9 +183,26 @@ public:
         return;
     }
 
+    virtual int getSortType() = 0;
+
     virtual vector<int> go1step() = 0; // 추상 클래스임을 명확히 하는 순수가상함수
 
 };
+
+// 컨트롤러 부모클래스
+class controller {
+protected:
+    printer* pt;
+    allSort* sol;
+    int ticktime;
+
+public:
+    controller() {}
+    ~controller() {}
+
+    virtual void start() = 0;
+};
+
 
 // 정렬 : 최소 버블 정렬 (오름차순)
 class bubbleSort : public allSort {
@@ -192,6 +210,8 @@ class bubbleSort : public allSort {
 public:
     bubbleSort() { return; }
     ~bubbleSort() { return; }
+
+    int getSortType() override { return 1; }
 
     vector<int> go1step() override {
         // 변화유무, 인덱스1, 인덱스2, 커서1, 커서2
@@ -226,6 +246,8 @@ public:
     selectionSort() { return; }
     ~selectionSort() { return; }
 
+    int getSortType() override { return 1; }
+
     vector<int> go1step() override {
         // 변화유무, 인덱스1, 인덱스2, 커서1, 커서2
         vector<int> foret = { 0,0,0,0,0,cur1,cur2 };
@@ -250,24 +272,20 @@ public:
     }
 };
 
-// 정렬 계산 후 패널 조작 명령
-class controller {
-private:
-    printer* pt;
-    allSort* sol;
-    int ticktime;
-
+// 단순이동용 컨트롤러 : 정렬 계산 후 패널 조작 명령 (버블. 선택)
+class controller1 : public controller {
 public:
 
-    controller(char* whatsort, allSort* solution, vector<int>& data, int tickt) : sol(solution), ticktime(tickt) {
+    controller1(char* whatsort, allSort* solution, vector<int>& data, int tickt) {
+        sol = solution; ticktime = tickt;
         pt = new printer(sol->getDatalen(), whatsort, ticktime);
         pt->insertData(data);
         sol->insertData(&data);
         return;
     }
-    ~controller() { delete(pt); return; }
+    ~controller1() { delete(pt); return; }
 
-    void start() {
+    void start() override {
         vector<int> res(7);
 
         do {
@@ -280,6 +298,34 @@ public:
         return;
     }
 };
+
+
+// 정렬 : 최소 삽입 정렬 (오름차순)
+class insertionSort {
+
+};
+
+// 정렬 : 최소 합병 정렬 (오름차순)
+class mergeSort {
+
+};
+
+// 정렬 : 최소 퀵 정렬 (오름차순)
+class quickSort {
+
+};
+
+// 슬라이드용 컨트롤러 : (삽입, 퀵)
+class controller2 : public controller {
+public:
+    controller2() {}
+    ~controller2() {}
+
+    void start() override {
+        return;
+    }
+};
+
 
 // 메인함수
 int main() {
@@ -303,11 +349,17 @@ int main() {
     // 틱 시간 설정 (1초 : 1000)
     int ticktime = 50;
 
-    // 컨트롤러 생성
-    controller con((char*)"title Bubble", &method, data, ticktime);
 
-    // 정렬 시작
-    con.start();
 
+    // 컨트롤러 생성, 실행
+    if (method.getSortType() == 1) {
+        controller1 con((char*)"title Bubble", &method, data, ticktime);
+        con.start();
+    }
+    else if (method.getSortType() == 2) {
+        controller2 con;
+        con.start();
+    }
+    
     return 0;
 }
