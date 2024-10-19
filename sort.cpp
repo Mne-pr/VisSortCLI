@@ -139,7 +139,12 @@ public:
     }
 
     // 특정 값 임시저장(프린터 제거)
-    void saveTemp() {
+    void pushValue(int value) {
+
+    }
+
+    // 특정 인덱스에 값 출력
+    void popValue(int idx) {
 
     }
 };
@@ -192,13 +197,19 @@ public:
 // 컨트롤러 부모클래스
 class controller {
 protected:
-    printer* pt;
-    allSort* sol;
-    int ticktime;
+    printer* pt = nullptr;
+    allSort* sol = nullptr;
+    int ticktime = 0;
 
 public:
-    controller() {}
-    ~controller() {}
+    controller(char* whatsort, allSort* solution, vector<int>& data, int tickt) {
+        sol = solution; ticktime = tickt;
+        pt = new printer(sol->getDatalen(), whatsort, ticktime);
+        pt->insertData(data);
+        sol->insertData(&data);
+        return;
+    }
+    ~controller() { delete(pt); return; }
 
     virtual void start() = 0;
 };
@@ -214,7 +225,7 @@ public:
     int getSortType() override { return 1; }
 
     vector<int> go1step() override {
-        // 변화유무, 인덱스1, 인덱스2, 커서1, 커서2
+        // 변화유무(없음, 바꿈), 인덱스1, 인덱스2, 커서1, 커서2
         vector<int> foret = { 0,0,0,0,0,cur,cur+1 };
 
         // cur, cur+1 값들을 바꿔야 할까요?
@@ -276,14 +287,8 @@ public:
 class controller1 : public controller {
 public:
 
-    controller1(char* whatsort, allSort* solution, vector<int>& data, int tickt) {
-        sol = solution; ticktime = tickt;
-        pt = new printer(sol->getDatalen(), whatsort, ticktime);
-        pt->insertData(data);
-        sol->insertData(&data);
-        return;
-    }
-    ~controller1() { delete(pt); return; }
+    controller1(char* ws, allSort* s, vector<int>& d, int t) : controller(ws, s, d, t) { }
+    ~controller1() { }
 
     void start() override {
         vector<int> res(7);
@@ -301,7 +306,58 @@ public:
 
 
 // 정렬 : 최소 삽입 정렬 (오름차순)
-class insertionSort {
+class insertionSort : public allSort {
+    int cur1 = 0;
+    int cur2 = 1;
+    int tmp = 0;
+    int first = 1;
+    int slided = 1;
+
+public:
+    insertionSort() { return; }
+    ~insertionSort() { return; }
+
+    int getSortType() override { return 2; }
+
+    vector<int> go1step() override {
+        // 결과유형(없음, 슬라이드, 값저장, 배치), 인덱스1, 인덱스2, 커서1, 커서2)
+        vector<int> foret = { 0,0,0,cur1,cur2 };
+
+        // 커서 2 위치가 타겟임. 일단 값 빼고, 커서1을 움직여서 적당한 자리를 찾은 후 커서 1 위치에 배치 -> 커서 2 위치 1 증가
+
+        // 종료 조건을 만족했나요?
+        if (cur2 == getDatalen()) { foret[0] = -1; }
+
+        else {
+            // 사이클이 지난 후 초기 상태인가요?
+            if (first == 1) {
+                foret = { 2,cur1,0,cur1,cur2 };
+                first = 0;
+            }
+
+            // 커서를 옮겨야 하나요?
+            if (slided == 1) { slided = 0; }
+
+            // 슬라이드 해야 하나요?
+            else if ((*data)[cur2] < (*data)[cur1]) {
+                foret = { 1,cur1,cur1 + 1,cur1,cur2 };
+                vchange(cur1, cur1 + 1);
+                cur1 -= 1;
+                slided = 1;
+            }
+
+            // 적당한 위치 찾았나요?
+            else {
+                foret = { 3,cur1,0,cur1,cur2 };
+                cur2 += 1;
+                cur1 = cur2 - 1;
+                first = 1;
+                cycle += 1;
+            }
+        }
+
+        return foret;
+    }
 
 };
 
@@ -318,10 +374,32 @@ class quickSort {
 // 슬라이드용 컨트롤러 : (삽입, 퀵)
 class controller2 : public controller {
 public:
-    controller2() {}
+    controller2(char* ws, allSort* s, vector<int>& d, int t) : controller(ws,s,d,t) {}
     ~controller2() {}
 
     void start() override {
+        vector<int> res(7);
+
+        do {
+            res = sol->go1step();
+            pt->printCursor(res[5], res[6]);
+
+            switch (res[0]) {
+            case 1: // 슬라이드
+                pt->printSlide();
+                break;
+            case 2: // 값 저장
+                pt->pushValue();
+                break;
+            case 3: // 배치
+                pt->popValue();
+                break;
+            default:
+                break;
+            }
+        } while (res[0] != -1);
+
+        pt->endPrint();
         return;
     }
 };
@@ -353,11 +431,11 @@ int main() {
 
     // 컨트롤러 생성, 실행
     if (method.getSortType() == 1) {
-        controller1 con((char*)"title Bubble", &method, data, ticktime);
+        controller1 con((char*)"title", &method, data, ticktime);
         con.start();
     }
     else if (method.getSortType() == 2) {
-        controller2 con;
+        controller2 con((char*)"title", &method, data, ticktime);
         con.start();
     }
     
